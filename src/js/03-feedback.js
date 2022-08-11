@@ -17,12 +17,11 @@ function onFormInput(e) {
 
 refs.form.addEventListener('input', throttle(onFormInput, 500));
 
+const storageData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
 function onPageLoad() {
-  let currentData = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  if (currentData) {
-    refs.input.value = currentData.email;
-    refs.textarea.value = currentData.message;
-    formData = currentData;
+  if (storageData) {
+    formData = storageData ?? {};
   }
 }
 
@@ -30,6 +29,14 @@ onPageLoad();
 
 function onFormSumbit(e) {
   e.preventDefault();
+  const filteredInputs = Array.from(refs.form.elements).filter(tag =>
+    ['textarea', 'input'].includes(tag.tagName.toLowerCase())
+  );
+
+  if (filteredInputs.some(i => !i.value)) {
+    alert('Fill in all the fields');
+    return;
+  }
 
   localStorage.removeItem(STORAGE_KEY);
   e.currentTarget.reset();
